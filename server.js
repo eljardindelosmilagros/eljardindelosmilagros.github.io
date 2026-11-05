@@ -111,7 +111,23 @@ Recuerda mencionar siempre consultar disponibilidad del d\xEDa al reservar.`;
     app.use(vite.middlewares);
   } else {
     const distPath = import_path.default.resolve(__dirname, "dist");
-    app.use(import_express.default.static(distPath));
+    const staticOptions = {
+      maxAge: "1h",
+      immutable: true,
+      setHeaders: (res, filePath) => {
+        const ext = import_path.default.extname(filePath).toLowerCase();
+        if (ext === ".js" || ext === ".mjs") {
+          res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+        } else if (ext === ".css") {
+          res.setHeader("Content-Type", "text/css; charset=utf-8");
+        } else if (ext === ".json") {
+          res.setHeader("Content-Type", "application/json; charset=utf-8");
+        } else if (ext === ".svg") {
+          res.setHeader("Content-Type", "image/svg+xml");
+        }
+      }
+    };
+    app.use(import_express.default.static(distPath, staticOptions));
     app.get("*", (_req, res) => {
       res.sendFile(import_path.default.join(distPath, "index.html"));
     });

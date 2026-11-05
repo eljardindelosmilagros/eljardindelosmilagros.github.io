@@ -228,7 +228,9 @@ Recuerda mencionar siempre consultar disponibilidad del día al reservar.`;
     }
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  const isProduction = process.env.NODE_ENV === 'production' || fs.existsSync(path.resolve(__dirname, 'dist'));
+
+  if (!isProduction) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -237,7 +239,25 @@ Recuerda mencionar siempre consultar disponibilidad del día al reservar.`;
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(__dirname, 'dist');
-    app.use(express.static(distPath));
+    const staticOptions = {
+      maxAge: '1h',
+      immutable: true,
+      setHeaders: (res: express.Response, filePath: string) => {
+        const ext = path.extname(filePath).toLowerCase();
+
+        if (ext === '.js' || ext === '.mjs') {
+          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (ext === '.css') {
+          res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        } else if (ext === '.json') {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        } else if (ext === '.svg') {
+          res.setHeader('Content-Type', 'image/svg+xml');
+        }
+      },
+    };
+
+    app.use(express.static(distPath, staticOptions));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
