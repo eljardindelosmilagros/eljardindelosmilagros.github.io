@@ -1,0 +1,6 @@
+{
+  "name": "El Jardín de los Milagros — Restaurante y Terraza en Nuevo Vedado, La Habana",
+  "description": "Un jardín escondido en Nuevo Vedado, La Habana. Carnes al carbón, cocina caribeña y cubana, coctelería e ingredientes del huerto en la azotea. Reserva tu mesa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
